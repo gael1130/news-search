@@ -59,8 +59,16 @@ def split_and_search(search_terms, from_date, to_date, useful_sources, useless_s
         print(f"  {'  ' * depth}Found {len(results)} results (max: {max_results}). Splitting period and searching again.")
         # Split the period in two and search again for each half
         mid_date = from_date + (to_date - from_date) / 2
-        results = split_and_search(search_terms, from_date, mid_date, useful_sources, useless_sources, max_results, depth+1) + \
-                  split_and_search(search_terms, mid_date + timedelta(days=1), to_date, useful_sources, useless_sources, max_results, depth+1)
+        # results = split_and_search(search_terms, from_date, mid_date, useful_sources, useless_sources, max_results, depth+1) + \
+                #   split_and_search(search_terms, mid_date + timedelta(days=1), to_date, useful_sources, useless_sources, max_results, depth+1)
+        
+        # updated version to Accumulate results from recursive calls
+        left_results = split_and_search(search_terms, from_date, mid_date, useful_sources, useless_sources, max_results, depth + 1)
+        right_results = split_and_search(search_terms, mid_date + timedelta(days=1), to_date, useful_sources, useless_sources, max_results, depth + 1)
+        
+        results.extend(left_results)
+        results.extend(right_results) 
+    
     return results
 
 
