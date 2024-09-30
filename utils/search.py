@@ -1,13 +1,12 @@
-import pandas as pd
 import time
 from datetime import datetime, timedelta
 from pygooglenews import GoogleNews
-from harmonize_classify_verify import clean_source, format_date_french, get_real_article_link, create_safe_filename, get_longest_word
-import csv
+from .harmonize_classify_verify import (
+    clean_source, format_date_french
+)
+from .data_utils import load_sources
 
-def load_sources(filename):
-    with open(filename, 'r', encoding='utf-8') as f:
-        return set(line.strip() for line in f)
+
 
 def classify_article(source, useful_sources, useless_sources):
     if source in useful_sources:
@@ -16,7 +15,6 @@ def classify_article(source, useful_sources, useless_sources):
         return "Inutile"
     else:
         return "Autre"
-    
 
 
 def extract_article_data(article, useful_sources, useless_sources):
@@ -29,19 +27,16 @@ def extract_article_data(article, useful_sources, useless_sources):
     source_cleaned = clean_source(source_href)
     category = classify_article(source_cleaned, useful_sources, useless_sources)
     
-    name = get_longest_word(title)
-    decoded_link = get_real_article_link(link)
-    periodique = article['source']['title']
+    # name = get_longest_word(title)
+    # periodique = article['source']['title']
     french_date = format_date_french(published_date)
 
-    return [title, source_cleaned, category, french_date, year, decoded_link]
-
+    return [title, source_cleaned, category, french_date, year, link]
 
 
 def perform_news_search(search_terms, from_date, to_date, useful_sources, useless_sources):
     gn = GoogleNews(lang='fr')
     results = []
-
     # Convert datetime to string format (YYYY-MM-DD)
     from_date_str = from_date.strftime('%Y-%m-%d')
     to_date_str = to_date.strftime('%Y-%m-%d')
@@ -51,7 +46,6 @@ def perform_news_search(search_terms, from_date, to_date, useful_sources, useles
             search_result = gn.search(term, from_=from_date_str, to_=to_date_str)
             entries = search_result.get('entries', [])
             for entry in entries:
-                # results.append([term, entry['title'], entry['source']['title'], entry['published'], entry['link']])
                 article_data = extract_article_data(entry, useful_sources, useless_sources)
                 results.append(article_data)
         except Exception as e:
@@ -150,57 +144,3 @@ def perform_test_search(search_terms):
     print("Test search process completed.")
     print(f"Total results: {len(results)}")
     return results
-
-
-def save_results_to_csv(results, csv_filename):
-    # Load useful and useless sources
-    useful_sources = load_sources('data/sources_utiles.csv')
-    useless_sources = load_sources('data/sources_inutiles.csv')
-
-    # Create DataFrame
-    df = pd.DataFrame(results, columns=["Titre", "Source", "Utilité", "Date (French)", "Année", "Lien"])
-
-    # Clean and classify sources
-    df['Source'] = df['Source'].apply(clean_source)
-    df['Utilité'] = df['Source'].apply(lambda x: classify_article(x, useful_sources, useless_sources))
-
-    # Format dates and extract year
-    # df['Publication Date'] = pd.to_datetime(df['Publication Date'], format='%a, %d %b %Y %H:%M:%S GMT')
-    # df['Année'] = df['Publication Date'].dt.year
-    # df['Date (French)'] = df['Publication Date'].apply(lambda x: format_date_french(x.strftime('%a, %d %b %Y %H:%M:%S GMT')))
-
-    # Get real article links
-    # df['Real Link'] = df['Link'].apply(get_real_article_link) # no need
-
-
-    # Save to CSV
-    df.to_csv(csv_filename, index=False, quoting=csv.QUOTE_ALL, encoding='utf-8-sig')
-
-    print(f"Results saved to {csv_filename}")
-    print(f"Total results: {len(df)}")
-    print(f"Results by utility: {df['Utilité'].value_counts().to_dict()}")
-    print(f"Results by year: {df['Année'].value_counts().sort_index().to_dict()}")
-
-
-def main():
-    # Define your search terms manually
-    search_terms = [
-        "Fondation d'entreprise Hermès"
-    ]
-
-    # Perform the searches across all periods
-    # results = perform_test_search(search_terms)
-
-    results = perform_searches_for_all_periods(search_terms)
-
-    # Save the results to a CSV file
-    # csv_filename = f"news_search_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-    # csv_filename = f"{search_terms[0]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-
-    # use this format: Malene Rydahl_2024_09_22_16h26.csv
-    safe_name = create_safe_filename(search_terms[0])
-    csv_filename = f"{safe_name}_{datetime.now().strftime('%Y_%m_%d_%Hh%M')}.csv"
-    save_results_to_csv(results, csv_filename)
-
-if __name__ == "__main__":
-    main()

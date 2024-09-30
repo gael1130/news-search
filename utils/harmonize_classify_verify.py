@@ -1,8 +1,6 @@
 import re
 import unicodedata
-# for the new code
 import datetime
-import requests
 
 
 def create_safe_filename(search_term):
@@ -46,24 +44,6 @@ def days_in_month(year, month):
         return 30
     else:
         return 31
-    
-# New code ***
-
-def get_longest_word(text):
-    """
-    Get the longest word from a text.
-    """
-    words = re.findall(r'\w+', text)
-    return max(words, key=len)
-
-
-def get_real_article_link(rss_link):
-    """
-    Translate Google News RSS link into the real article link.
-    """
-    response = requests.get(rss_link)
-    real_link = response.url
-    return real_link
 
 
 def format_date_french(date_string):
@@ -79,9 +59,3 @@ def format_date_french(date_string):
     month = months[date_obj.month - 1]
     year = date_obj.year
     return f"{day} {month} {year}"
-# End of new code ***
-    
-# List Utility Functions
-def remove_empty_values(row):
-    """ Remove all empty strings from the row. """
-    return [value for value in row if value]
