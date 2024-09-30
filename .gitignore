@@ -1,5 +1,7 @@
 results/
 
+tips_and_tricks.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
