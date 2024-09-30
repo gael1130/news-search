@@ -1,11 +1,10 @@
 import time
 from datetime import datetime, timedelta
-from pygooglenews import GoogleNews
 from .harmonize_classify_verify import (
     clean_source, format_date_french
 )
 from .data_utils import load_sources
-
+from .pygooglenews import GoogleNews
 
 
 def classify_article(source, useful_sources, useless_sources):
