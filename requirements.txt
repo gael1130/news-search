@@ -2,9 +2,9 @@ beautifulsoup4==4.12.3
 cachetools==5.5.0
 certifi==2024.8.30
 charset-normalizer==3.3.2
-dateparser==1.2.0
+dateparser
 et-xmlfile==1.1.0
-feedparser==6.0.11
+feedparser
 google-auth==2.34.0
 google-auth-oauthlib==1.2.1
 gspread==6.1.2
@@ -15,7 +15,6 @@ openpyxl==3.1.5
 pandas==2.2.2
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
-pygooglenews==0.1.2
 python-dateutil==2.9.0.post0
 pytz==2024.1
 regex==2024.7.24
