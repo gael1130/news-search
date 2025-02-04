@@ -7,6 +7,7 @@ Please create a results folder in the root directory of the project.
 ```
 docker pull kalel1130/news-search:latest
 ```
+Create a data folder in the root directory of the project to put the useful and useless lists csvs.
 
 Create a results folder in the root directory of the project.
 
